@@ -327,6 +327,34 @@ docker compose exec -T postgres psql -U app -d cryptobot < docs/sql/analytics_vi
 Откройте в браузере: `http://IP_СЕРВЕРА:3000`  
 **Не оставляйте порт 3000 открытым для всего интернета** — закройте firewall или настройте VPN.
 
+### Готовый дашборд (автоматически)
+
+1. Пройдите **первичную настройку** Metabase в браузере (email и пароль админа).
+2. Добавьте в `.env` на VPS:
+
+```env
+METABASE_EMAIL=ваш_email@example.com
+METABASE_PASSWORD=ваш_пароль_из_шага_1
+```
+
+3. Создайте дашборд одной командой:
+
+```bash
+docker compose exec bot python scripts/metabase_setup_dashboard.py
+```
+
+Или вместе с views и запуском Metabase:
+
+```bash
+chmod +x scripts/setup-metabase.sh
+./scripts/setup-metabase.sh
+```
+
+Скрипт подключит БД `cryptobot`, создаст 11 карточек и дашборд **CryptoSignalsBot Analytics**:
+активные подписчики, MRR, free/paid, сигналы по дням и типам, uptime коллекторов, задержка доставки, когорты, последние сигналы.
+
+Повторный запуск безопасен — существующие карточки и дашборд переиспользуются.
+
 ---
 
 ## Шаг 15. Бэкапы (рекомендуется)
