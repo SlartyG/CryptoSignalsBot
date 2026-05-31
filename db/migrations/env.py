@@ -18,7 +18,7 @@ def get_url() -> str:
         return url
     from shared.config import settings
 
-    return settings.database_url.replace("+asyncpg", "")
+    return settings.database_url.replace("+asyncpg", "+psycopg2")
 
 
 def run_migrations_offline() -> None:
