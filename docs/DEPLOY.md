@@ -340,6 +340,7 @@ METABASE_PASSWORD=ваш_пароль_из_шага_1
 3. Создайте дашборд одной командой:
 
 ```bash
+docker compose build bot
 docker compose exec bot python scripts/metabase_setup_dashboard.py
 ```
 
@@ -349,6 +350,8 @@ docker compose exec bot python scripts/metabase_setup_dashboard.py
 chmod +x scripts/setup-metabase.sh
 ./scripts/setup-metabase.sh
 ```
+
+> Скрипт дашборда лежит в образе `bot` — после `git pull` нужен `docker compose build bot`.
 
 Скрипт подключит БД `cryptobot`, создаст 11 карточек и дашборд **CryptoSignalsBot Analytics**:
 активные подписчики, MRR, free/paid, сигналы по дням и типам, uptime коллекторов, задержка доставки, когорты, последние сигналы.

@@ -24,6 +24,12 @@ echo "Waiting for Metabase to become ready..."
 sleep 15
 
 if [ -n "${METABASE_EMAIL:-}" ] && [ -n "${METABASE_PASSWORD:-}" ]; then
+  if [ ! -f scripts/metabase_setup_dashboard.py ]; then
+    echo "Error: scripts/metabase_setup_dashboard.py not found. Run: git pull" >&2
+    exit 1
+  fi
+  echo "Rebuilding bot image (dashboard script is baked into the image)..."
+  docker compose up -d --build bot
   echo "Creating analytics dashboard..."
   docker compose exec -T \
     -e METABASE_URL=http://metabase:3000 \
@@ -34,6 +40,7 @@ if [ -n "${METABASE_EMAIL:-}" ] && [ -n "${METABASE_PASSWORD:-}" ]; then
 else
   echo ""
   echo "Dashboard not created: set METABASE_EMAIL and METABASE_PASSWORD in .env, then run:"
+  echo "  docker compose build bot"
   echo "  docker compose exec bot python scripts/metabase_setup_dashboard.py"
 fi
 
