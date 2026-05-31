@@ -136,15 +136,20 @@ BOT_TOKEN=7123456789:AAHxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CRYPTO_PAY_TOKEN=
 ADMIN_TELEGRAM_IDS=123456789
 POSTGRES_PASSWORD=MyStr0ngP@ssw0rd2024
-DATABASE_URL=postgresql+asyncpg://app:MyStr0ngP@ssw0rd2024@postgres:5432/cryptobot
-REDIS_URL=redis://redis:6379/0
 ```
 
 Важно:
 
-- **`POSTGRES_PASSWORD`** и пароль в **`DATABASE_URL`** должны **совпадать**.
-- **`ADMIN_TELEGRAM_IDS`** — ваш ID из шага 2. Несколько админов через запятую: `111,222`.
-- **`CRYPTO_PAY_TOKEN`** — пока можно оставить пустым.
+- **`BOT_TOKEN`** — без кавычек, без пробелов вокруг `=`.
+- **`ADMIN_TELEGRAM_IDS`** — ваш ID из шага 2.
+- **`POSTGRES_PASSWORD`** — придумайте пароль; `DATABASE_URL` и `REDIS_URL` для VPS **можно не писать** — Docker Compose подставит их сам.
+
+Проверка файла:
+
+```bash
+grep BOT_TOKEN .env
+cat .env
+```
 
 Сохранить в nano: `Ctrl+O`, Enter, выход: `Ctrl+X`.
 
@@ -222,13 +227,17 @@ cd /opt/CryptoSignalsBot
 docker compose up -d --build
 ```
 
-Первый запуск займёт 3–10 минут (скачивание образов, сборка).
+При старте контейнеры **сами применяют миграции** (`alembic upgrade head`).
 
-Примените миграции базы:
+Проверить миграции вручную (опционально):
 
 ```bash
-docker compose exec bot alembic upgrade head
+docker compose exec bot alembic current
+docker compose exec bot printenv BOT_TOKEN
 ```
+
+`alembic current` должен показать `006_channels_verified (head)` или последнюю ревизию.  
+`printenv BOT_TOKEN` — не пустой.
 
 Проверьте, что контейнеры работают:
 
@@ -339,6 +348,27 @@ docker compose exec bot alembic upgrade head
 ---
 
 ## Частые проблемы
+
+### `BOT_TOKEN is not set`
+
+Файл `.env` на VPS пустой или без токена:
+
+```bash
+nano /opt/CryptoSignalsBot/.env
+# добавьте: BOT_TOKEN=7123...:AAH...
+docker compose up -d --force-recreate bot worker
+docker compose exec bot printenv BOT_TOKEN
+```
+
+### `relation "collector_metrics" does not exist`
+
+Не применены миграции 002+:
+
+```bash
+docker compose exec bot alembic upgrade head
+docker compose exec bot alembic current
+docker compose restart worker
+```
 
 ### Бот не отвечает
 

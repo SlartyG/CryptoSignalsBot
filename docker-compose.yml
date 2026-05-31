@@ -26,6 +26,10 @@ services:
     command: python -m bot.main
     env_file: .env
     environment:
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      CRYPTO_PAY_TOKEN: ${CRYPTO_PAY_TOKEN:-}
+      ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
       DATABASE_URL: postgresql+asyncpg://app:${POSTGRES_PASSWORD:-app}@postgres:5432/cryptobot
       REDIS_URL: redis://redis:6379/0
     depends_on:
@@ -40,6 +44,10 @@ services:
     command: python -m worker.main
     env_file: .env
     environment:
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      CRYPTO_PAY_TOKEN: ${CRYPTO_PAY_TOKEN:-}
+      ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
       DATABASE_URL: postgresql+asyncpg://app:${POSTGRES_PASSWORD:-app}@postgres:5432/cryptobot
       REDIS_URL: redis://redis:6379/0
     depends_on:

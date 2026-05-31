@@ -96,32 +96,53 @@ async def reminder_scheduler(stop_event: asyncio.Event) -> None:
             pass
 
 
+async def _supervised(name: str, coro_fn, stop_event: asyncio.Event) -> None:
+    while not stop_event.is_set():
+        try:
+            await coro_fn(stop_event)
+            return
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("Worker task %s crashed, retry in 10s", name)
+            try:
+                await asyncio.wait_for(stop_event.wait(), timeout=10)
+                return
+            except asyncio.TimeoutError:
+                pass
+
+
 async def main() -> None:
     stop_event = asyncio.Event()
     tasks = [
-        asyncio.create_task(periodic(stop_event, 300, "funding", run_funding_collector)),
-        asyncio.create_task(periodic(stop_event, 300, "oi", run_oi_collector)),
-        asyncio.create_task(periodic(stop_event, 900, "volume", run_volume_collector)),
-        asyncio.create_task(universe_scheduler(stop_event)),
-        asyncio.create_task(liquidation_listener(stop_event)),
-        asyncio.create_task(run_notifier(stop_event)),
-        asyncio.create_task(payment_poller(stop_event)),
-        asyncio.create_task(reminder_scheduler(stop_event)),
+        asyncio.create_task(_supervised("funding", lambda e: periodic(e, 300, "funding", run_funding_collector), stop_event)),
+        asyncio.create_task(_supervised("oi", lambda e: periodic(e, 300, "oi", run_oi_collector), stop_event)),
+        asyncio.create_task(_supervised("volume", lambda e: periodic(e, 900, "volume", run_volume_collector), stop_event)),
+        asyncio.create_task(_supervised("universe", universe_scheduler, stop_event)),
+        asyncio.create_task(_supervised("liquidations", liquidation_listener, stop_event)),
+        asyncio.create_task(_supervised("notifier", run_notifier, stop_event)),
+        asyncio.create_task(_supervised("payments", payment_poller, stop_event)),
+        asyncio.create_task(_supervised("reminders", reminder_scheduler, stop_event)),
     ]
 
-    async with SessionLocal() as session:
-        client = BybitClient()
-        await client.start()
-        try:
-            await refresh_universe(session, client)
-        finally:
-            await client.close()
+    try:
+        async with SessionLocal() as session:
+            client = BybitClient()
+            await client.start()
+            try:
+                await refresh_universe(session, client)
+            finally:
+                await client.close()
+    except Exception:
+        logger.exception("Initial universe refresh failed, worker continues")
 
     logger.info("Worker started")
     try:
         await asyncio.gather(*tasks)
     finally:
         stop_event.set()
+        for task in tasks:
+            task.cancel()
         await close_redis()
 
 
