@@ -13,15 +13,16 @@ target_metadata = Base.metadata
 
 
 def get_url() -> str:
-    from shared.config import settings
+    import os
 
-    url = settings.database_url.replace("+asyncpg", "+psycopg2")
-    if url:
-        return url
-    fallback = config.get_main_option("sqlalchemy.url")
-    if fallback:
-        return fallback
-    raise RuntimeError("DATABASE_URL is not configured")
+    url = os.getenv("DATABASE_URL", "").strip()
+    if not url:
+        from shared.config import settings
+
+        url = settings.database_url
+    if not url:
+        raise RuntimeError("DATABASE_URL is not configured")
+    return url.replace("+asyncpg", "+psycopg2")
 
 
 def run_migrations_offline() -> None:
