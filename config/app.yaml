@@ -1,0 +1,25 @@
+admin_telegram_ids: [533476085]
+
+support_contact: "@your_support"
+
+# Free onboarding: user must subscribe to all listed channels once at /start.
+# Bot must be admin in each channel to verify membership.
+# Leave empty [] to skip channel check.
+required_channels:
+  - id: "@midas_crypto_signals"
+    title: "Midas | Crypto Signals"
+    url: "https://t.me/midas_crypto_signals"
+  # - id: "@another_channel"
+  #   title: "News"
+  #   url: "https://t.me/another_channel"
+
+links:
+  offer_ru: "https://telegra.ph/offer-ru"
+  offer_en: "https://telegra.ph/offer-en"
+  offer_ua: "https://telegra.ph/offer-ua"
+  privacy_ru: "https://telegra.ph/privacy-ru"
+  privacy_en: "https://telegra.ph/privacy-en"
+  privacy_ua: "https://telegra.ph/privacy-ua"
+  faq_ru: "https://telegra.ph/faq-ru"
+  faq_en: "https://telegra.ph/faq-en"
+  faq_ua: "https://telegra.ph/faq-ua"

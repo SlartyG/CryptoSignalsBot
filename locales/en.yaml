@@ -1,0 +1,92 @@
+start_welcome: |
+  Welcome to CryptoSignalsBot.
+
+  The bot sends market anomaly alerts from Bybit: funding, OI, liquidations, volume.
+
+  Choose language / Выберите язык:
+
+language_set: "Language: English"
+
+channels_text: |
+  Subscribe to our channels for free access.
+  Tap the buttons below, then «Check subscription».
+
+btn_check_subscription: "✅ Check subscription"
+channels_not_subscribed: "You are not subscribed to: {channels}"
+channels_verified: "Subscription confirmed!"
+channels_required: "Please subscribe to the channels first"
+
+consent_text: |
+  Before using the bot, please accept:
+
+  • [Public offer]({offer_url})
+  • [Privacy policy]({privacy_url})
+
+  By tapping «Accept», you agree to the terms.
+
+consent_accept: "✅ Accept"
+consent_decline: "❌ Cancel"
+consent_required: "You must accept the terms to continue. Press /start"
+
+main_menu_text: |
+  Main menu.
+
+  Plan: {tier}
+  Language: {language}
+
+btn_profile: "👤 Profile"
+btn_subscription: "💳 Subscription"
+btn_settings: "⚙️ Settings"
+btn_faq: "❓ FAQ"
+btn_support: "📩 Support"
+btn_back: "◀️ Back"
+btn_buy_1m: "1 month"
+btn_buy_3m: "3 months (−25%)"
+btn_buy_12m: "12 months (−50%)"
+
+profile_text: |
+  👤 Profile
+
+  ID: {telegram_id}
+  Username: @{username}
+  Language: {language}
+  Plan: {tier}
+  Registered: {created_at}
+
+subscription_text: |
+  💳 Subscription
+
+  Status: {status}
+  Valid until: {ends_at}
+
+  Choose a plan and currency:
+
+settings_text: |
+  ⚙️ Signal settings
+
+  {settings_list}
+
+settings_pairs_text: |
+  ⚙️ Pairs (paid)
+
+  {pairs_list}
+
+faq_text: "FAQ: {url}"
+support_text: "Support: {contact}"
+
+tier_free: "Free (BTC)"
+tier_paid: "Paid (top-10)"
+
+sub_status_active: "active"
+sub_status_none: "no paid subscription"
+
+signal_on: "🟢"
+signal_off: "🔴"
+
+pay_currency_usdt: "USDT"
+pay_currency_ton: "TON"
+pay_currency_btc: "BTC"
+
+invoice_created: "Invoice created. Pay here:\n{url}"
+
+not_implemented: "This section is under development."

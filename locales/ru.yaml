@@ -1,0 +1,92 @@
+start_welcome: |
+  Добро пожаловать в CryptoSignalsBot.
+
+  Бот присылает алерты о рыночных аномалиях на Bybit: funding, OI, ликвидации, объём.
+
+  Выберите язык / Choose language:
+
+language_set: "Язык: Русский"
+
+channels_text: |
+  Для бесплатного доступа подпишитесь на наши каналы.
+  Нажмите на кнопки ниже, затем «Проверить подписку».
+
+btn_check_subscription: "✅ Проверить подписку"
+channels_not_subscribed: "Вы не подписаны на: {channels}"
+channels_verified: "Подписка подтверждена!"
+channels_required: "Сначала подпишитесь на каналы"
+
+consent_text: |
+  Перед использованием примите условия:
+
+  • [Публичная оферта]({offer_url})
+  • [Политика конфиденциальности]({privacy_url})
+
+  Нажимая «Принимаю», вы соглашаетесь с документами.
+
+consent_accept: "✅ Принимаю"
+consent_decline: "❌ Отмена"
+consent_required: "Для доступа к боту нужно принять условия. Нажмите /start"
+
+main_menu_text: |
+  Главное меню.
+
+  Тариф: {tier}
+  Язык: {language}
+
+btn_profile: "👤 Профиль"
+btn_subscription: "💳 Подписка"
+btn_settings: "⚙️ Настройки"
+btn_faq: "❓ FAQ"
+btn_support: "📩 Поддержка"
+btn_back: "◀️ Назад"
+btn_buy_1m: "1 мес"
+btn_buy_3m: "3 мес (−25%)"
+btn_buy_12m: "12 мес (−50%)"
+
+profile_text: |
+  👤 Профиль
+
+  ID: {telegram_id}
+  Username: @{username}
+  Язык: {language}
+  Тариф: {tier}
+  Регистрация: {created_at}
+
+subscription_text: |
+  💳 Подписка
+
+  Статус: {status}
+  Действует до: {ends_at}
+
+  Выберите план и валюту:
+
+settings_text: |
+  ⚙️ Настройки сигналов
+
+  {settings_list}
+
+settings_pairs_text: |
+  ⚙️ Пары (paid)
+
+  {pairs_list}
+
+faq_text: "Частые вопросы: {url}"
+support_text: "Поддержка: {contact}"
+
+tier_free: "Free (BTC)"
+tier_paid: "Paid (топ-10)"
+
+sub_status_active: "активна"
+sub_status_none: "нет paid-подписки"
+
+signal_on: "🟢"
+signal_off: "🔴"
+
+pay_currency_usdt: "USDT"
+pay_currency_ton: "TON"
+pay_currency_btc: "BTC"
+
+invoice_created: "Счёт создан. Оплатите по ссылке:\n{url}"
+
+not_implemented: "Раздел в разработке."

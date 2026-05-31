@@ -1,0 +1,12 @@
+# Проброс портов для локальной разработки (Mac / Linux).
+# Использование:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres redis
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"

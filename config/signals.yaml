@@ -1,0 +1,25 @@
+funding:
+  medium_threshold: 0.0005
+  high_threshold: 0.001
+  spike_multiplier: 2.0
+
+oi:
+  change_1h_pct: 8
+  price_change_1h_pct: 2
+  liquidation_oi_drop_pct: 10
+
+liquidation:
+  window_minutes: 15
+  medium_usd: 500000
+  high_usd: 2000000
+
+volume:
+  spike_multiplier: 2.5
+  high_spike_multiplier: 4.0
+  min_price_change_pct: 1.5
+
+cooldown_minutes:
+  funding: 60
+  oi: 45
+  liquidation: 30
+  volume: 60
