@@ -44,6 +44,7 @@ services:
     command: python -m worker.main
     env_file: .env
     environment:
+      SKIP_MIGRATIONS: "1"
       BOT_TOKEN: ${BOT_TOKEN:-}
       CRYPTO_PAY_TOKEN: ${CRYPTO_PAY_TOKEN:-}
       ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS:-}
@@ -55,6 +56,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      bot:
+        condition: service_started
     restart: unless-stopped
 
   metabase:
