@@ -304,13 +304,21 @@ docker compose logs worker --tail 50
 
 ## Шаг 14. Metabase (аналитика, можно позже)
 
-Когда бот уже работает:
+Когда бот уже работает — **сначала создайте БД `metabase`**, иначе контейнер будет падать с `database "metabase" does not exist`:
 
 ```bash
+docker compose exec postgres psql -U app -d cryptobot -c "CREATE DATABASE metabase;"
 docker compose --profile analytics up -d metabase
 ```
 
-Подключите SQL-views:
+Или одной командой (создание БД + views + запуск):
+
+```bash
+chmod +x scripts/setup-metabase.sh
+./scripts/setup-metabase.sh
+```
+
+Подключите SQL-views (если не использовали `setup-metabase.sh`):
 
 ```bash
 docker compose exec -T postgres psql -U app -d cryptobot < docs/sql/analytics_views.sql
