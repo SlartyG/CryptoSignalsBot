@@ -209,7 +209,7 @@ nano config/pricing.yaml
 ```
 
 ```yaml
-month_usdt: 15      # цена за 1 месяц в USDT
+month_usdt: 25      # цена за 1 месяц в USDT
 month_ton: 0        # 0 = не используется, считается из USDT
 month_btc: 0
 
@@ -236,7 +236,7 @@ docker compose exec bot alembic current
 docker compose exec bot printenv BOT_TOKEN
 ```
 
-`alembic current` должен показать `006_channels_verified (head)` или последнюю ревизию.  
+`alembic current` должен показать `007_v2_features (head)` или последнюю ревизию.  
 `printenv BOT_TOKEN` — не пустой.
 
 Проверьте, что контейнеры работают:
@@ -289,8 +289,8 @@ docker compose logs worker --tail 50
 
 Сигналы не приходят каждую минуту — только при аномалиях на Bybit.
 
-- Free-пользователь получает только **BTC**.
-- Paid — топ-10 пар (нужна подписка или `/grant`).
+- Free — **10 базовых** пар, доставка с задержкой ~1 мин.
+- Paid — до **100** пар (нужна подписка или `/grant`); после онбординга придёт снимок BTC.
 
 Выдать себе paid на 30 дней для теста:
 
@@ -431,7 +431,7 @@ docker compose logs worker --tail 100
 ```
 
 - Worker должен быть Up.
-- Для free — только BTC, события на рынке могут быть редкими.
+- Для free — 10 базовых пар; сигналы приходят только при срабатывании правил.
 - Вы прошли онбординг до конца (оферта принята)?
 
 ### Ошибка при `docker compose up`
