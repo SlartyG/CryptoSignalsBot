@@ -40,7 +40,7 @@ async def refresh_universe(session: AsyncSession, client: BybitClient) -> list[s
             top.insert(0, sym)
             if sym not in turnover_map:
                 turnover_map[sym] = 0.0
-    top = top[:UNIVERSE_SIZE]
+    top = list(dict.fromkeys(top))[:UNIVERSE_SIZE]
 
     now = datetime.now(timezone.utc)
     await session.execute(

@@ -14,6 +14,18 @@ async def get_active_symbols(session: AsyncSession) -> list[str]:
     return list(ALWAYS_SYMBOLS)
 
 
+def _dedupe_universe_rows(
+    rows: list[tuple[str, int, float]],
+) -> list[tuple[str, int, float]]:
+    """One row per symbol; keep the best (lowest) rank if duplicates exist."""
+    best: dict[str, tuple[str, int, float]] = {}
+    for sym, rank, turnover in rows:
+        entry = (sym, rank, float(turnover or 0))
+        if sym not in best or rank < best[sym][1]:
+            best[sym] = entry
+    return sorted(best.values(), key=lambda item: item[1])
+
+
 async def get_universe_entries(session: AsyncSession) -> list[tuple[str, int, float]]:
     """symbol, rank, turnover_24h (0 if missing)."""
     now = datetime.now(timezone.utc)
@@ -25,7 +37,8 @@ async def get_universe_entries(session: AsyncSession) -> list[tuple[str, int, fl
     rows = result.all()
     if not rows:
         return []
-    return [(sym, rank, float(turnover or 0)) for sym, rank, turnover in rows]
+    parsed = [(sym, rank, float(turnover or 0)) for sym, rank, turnover in rows]
+    return _dedupe_universe_rows(parsed)
 
 
 async def get_base_symbols(session: AsyncSession) -> list[str]:

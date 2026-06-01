@@ -154,7 +154,21 @@ def pairs_keyboard(
     total_pages: int,
 ) -> InlineKeyboardMarkup:
     start = page * PAIRS_PAGE_SIZE
-    page_symbols = symbols[start : start + PAIRS_PAGE_SIZE]
+    page_symbols: list[str] = []
+    seen: set[str] = set()
+    for sym in symbols[start : start + PAIRS_PAGE_SIZE]:
+        if sym in seen:
+            continue
+        seen.add(sym)
+        page_symbols.append(sym)
+    # If DB had duplicates, backfill from next symbols so the page stays full.
+    idx = start + PAIRS_PAGE_SIZE
+    while len(page_symbols) < PAIRS_PAGE_SIZE and idx < len(symbols):
+        sym = symbols[idx]
+        idx += 1
+        if sym not in seen:
+            seen.add(sym)
+            page_symbols.append(sym)
 
     rows: list[list[InlineKeyboardButton]] = []
     row: list[InlineKeyboardButton] = []
