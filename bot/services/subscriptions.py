@@ -27,6 +27,16 @@ async def activate_subscription(
 
 
 async def mark_payment_paid(session: AsyncSession, payment: Payment) -> Subscription:
+    from bot.services.analytics import track
+
     payment.status = PaymentStatus.PAID
     payment.paid_at = datetime.now(timezone.utc)
-    return await activate_subscription(session, payment.user_id, payment.plan)
+    sub = await activate_subscription(session, payment.user_id, payment.plan)
+    await track(
+        session,
+        payment.user_id,
+        "payment_paid",
+        plan=payment.plan,
+        amount_usdt=payment.amount_usdt,
+    )
+    return sub

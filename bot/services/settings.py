@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import UserSignalSetting
 from shared.signal_types import SignalType
+from shared.universe import get_default_paid_symbols
 
 ALL_SIGNAL_TYPES = [t.value for t in SignalType]
 
@@ -44,8 +45,8 @@ async def get_settings_map(session: AsyncSession, user_id: int) -> dict[str, boo
     return {s.signal_type: s.enabled for s in result.scalars().all() if s.signal_type in ALL_SIGNAL_TYPES}
 
 
-async def toggle_symbol(
-    session: AsyncSession, user_id: int, symbol: str, universe: list[str]
+async def get_selected_symbols(
+    session: AsyncSession, user_id: int, universe: list[str]
 ) -> list[str]:
     result = await session.execute(
         select(UserSignalSetting).where(
@@ -54,16 +55,29 @@ async def toggle_symbol(
         )
     )
     setting = result.scalar_one_or_none()
-    if setting is None or not setting.symbols:
-        current = list(universe)
-    else:
-        current = list(setting.symbols)
+    if setting and setting.symbols:
+        return [s for s in setting.symbols if s in universe]
+    default = await get_default_paid_symbols(session)
+    return [s for s in default if s in universe]
+
+
+async def toggle_symbol(
+    session: AsyncSession, user_id: int, symbol: str, universe: list[str]
+) -> list[str]:
+    current = await get_selected_symbols(session, user_id, universe)
 
     if symbol in current:
         current.remove(symbol)
     else:
         current.append(symbol)
 
+    result = await session.execute(
+        select(UserSignalSetting).where(
+            UserSignalSetting.user_id == user_id,
+            UserSignalSetting.signal_type == "symbols",
+        )
+    )
+    setting = result.scalar_one_or_none()
     if setting is None:
         session.add(
             UserSignalSetting(user_id=user_id, signal_type="symbols", enabled=True, symbols=current)

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.i18n import t
 from bot.keyboards import back_keyboard, currency_keyboard, subscription_keyboard
+from bot.services.analytics import track
 from bot.services.crypto_pay import CryptoPayClient
 from bot.services.users import get_or_create_user, get_active_subscription
 from db.models import Payment, PaymentStatus
@@ -18,6 +19,7 @@ async def menu_subscription(callback: CallbackQuery, session: AsyncSession) -> N
         session, callback.from_user.id, callback.from_user.username
     )
     lang = user.language
+    await track(session, user.id, "menu_subscription_open")
     sub = await get_active_subscription(session, user.id)
 
     if sub:
@@ -27,6 +29,7 @@ async def menu_subscription(callback: CallbackQuery, session: AsyncSession) -> N
         status = t(lang, "sub_status_none")
         ends_at = "—"
 
+    await session.commit()
     await callback.message.edit_text(
         t(lang, "subscription_text", status=status, ends_at=ends_at),
         reply_markup=subscription_keyboard(lang),
@@ -43,7 +46,7 @@ async def choose_plan(callback: CallbackQuery, session: AsyncSession) -> None:
     lang = user.language
     await callback.message.edit_text(
         t(lang, "subscription_text", status=t(lang, "sub_status_none"), ends_at="—")
-        + f"\n\nPlan: {plan}",
+        + f"\n\n{t(lang, 'plan_selected', plan=plan)}",
         reply_markup=currency_keyboard(lang, plan),
     )
     await callback.answer()
@@ -86,6 +89,14 @@ async def create_payment(callback: CallbackQuery, session: AsyncSession) -> None
         status=PaymentStatus.PENDING,
     )
     session.add(payment)
+    await track(
+        session,
+        user.id,
+        "payment_invoice_created",
+        plan=plan,
+        currency=currency,
+        amount_usdt=amount_usdt,
+    )
     await session.commit()
 
     url = invoice.get("bot_invoice_url") or invoice.get("pay_url", "")

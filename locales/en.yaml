@@ -6,6 +6,7 @@ start_welcome: |
   Choose language / Выберите язык:
 
 language_set: "Language: English"
+choose_language: "Choose interface language:"
 
 channels_text: |
   Subscribe to our channels for free access.
@@ -16,11 +17,13 @@ channels_not_subscribed: "You are not subscribed to: {channels}"
 channels_verified: "Subscription confirmed!"
 channels_required: "Please subscribe to the channels first"
 
+consent_offer_label: "Public offer"
+consent_privacy_label: "Privacy policy"
 consent_text: |
   Before using the bot, please accept:
 
-  • [Public offer]({offer_url})
-  • [Privacy policy]({privacy_url})
+  • {offer_link}
+  • {privacy_link}
 
   By tapping «Accept», you agree to the terms.
 
@@ -37,9 +40,12 @@ main_menu_text: |
 btn_profile: "👤 Profile"
 btn_subscription: "💳 Subscription"
 btn_settings: "⚙️ Settings"
+btn_alerts_guide: "📖 How to read alerts"
 btn_faq: "❓ FAQ"
 btn_support: "📩 Support"
 btn_back: "◀️ Back"
+btn_language: "🌐 Language"
+btn_pairs: "📊 Pairs"
 btn_buy_1m: "1 month"
 btn_buy_3m: "3 months (−25%)"
 btn_buy_12m: "12 months (−50%)"
@@ -61,6 +67,8 @@ subscription_text: |
 
   Choose a plan and currency:
 
+plan_selected: "Plan: {plan}"
+
 settings_text: |
   ⚙️ Signal settings
 
@@ -69,13 +77,40 @@ settings_text: |
 settings_pairs_text: |
   ⚙️ Pairs (paid)
 
+  Page {page}/{total_pages} · selected: {selected_count}
+
   {pairs_list}
+
+pairs_sort_vol: "📊 By volume"
+pairs_sort_alpha: "🔤 Alphabetical"
+pairs_paid_only: "Pair selection is available on the paid plan"
+
+signal_type_funding: "Funding"
+signal_type_oi: "OI+Price"
+signal_type_liq: "Liquidation"
+signal_type_volume: "Volume"
+
+alerts_guide_text: |
+  <b>How to read an alert</b>
+
+  Each message starts with the pair and signal type, e.g.:
+  <b>BTCUSDT · Funding Extreme</b>
+
+  <b>Funding Extreme</b> — funding rate deviated strongly from the 24h average.
+  <b>OI + Price</b> — open interest and price moved over 1h; pattern line below (new longs, flush, etc.).
+  <b>Liquidation Spike</b> — large liquidations in a short window.
+  <b>Volume Spike</b> — hourly volume is well above the usual level.
+
+  The <b>bias</b> line shows tilt (bullish / bearish / neutral).
+  <b>medium / high</b> — strength vs our thresholds.
+
+  This is context for analysis, not a «enter now» signal.
 
 faq_text: "FAQ: {url}"
 support_text: "Support: {contact}"
 
-tier_free: "Free (BTC)"
-tier_paid: "Paid (top-10)"
+tier_free: "Free (10 markets, −1 min)"
+tier_paid: "Paid (up to 100 markets)"
 
 sub_status_active: "active"
 sub_status_none: "no paid subscription"
@@ -90,3 +125,10 @@ pay_currency_btc: "BTC"
 invoice_created: "Invoice created. Pay here:\n{url}"
 
 not_implemented: "This section is under development."
+
+btc_snapshot_title: "🎁 BTC market snapshot"
+btc_snapshot_price: "💰 Price: ${price} · 24h: {change_24h}%"
+btc_snapshot_funding: "📊 Funding: {funding_pct:+.3f}% · avg 24h: {avg_24h_pct:+.3f}%"
+btc_snapshot_oi: "📈 OI (5m): {oi_change_pct:+.1f}%"
+btc_snapshot_volume: "📉 Vol 1h: {volume_ratio:.1f}× median · price 1h: {price_change_1h:+.1f}%"
+btc_snapshot_disclaimer: "ℹ️ Not financial advice. Alerts are sent automatically when rules trigger."

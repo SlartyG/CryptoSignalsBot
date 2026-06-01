@@ -13,8 +13,11 @@ from bot.keyboards import (
     language_keyboard,
     main_menu_keyboard,
 )
+from bot.services.analytics import track
+from bot.services.btc_snapshot import build_btc_snapshot
 from bot.services.channels import channel_gate_required, check_user_subscribed
 from bot.services.users import get_or_create_user, user_tier
+from bot.text_html import link
 from shared.yaml_config import load_yaml
 
 router = Router()
@@ -31,6 +34,13 @@ def _links(lang: str) -> dict[str, str]:
     }
 
 
+def _consent_html(lang: str) -> str:
+    links = _links(lang)
+    offer = link(links["offer_url"], t(lang, "consent_offer_label"))
+    privacy = link(links["privacy_url"], t(lang, "consent_privacy_label"))
+    return t(lang, "consent_text", offer_link=offer, privacy_link=privacy)
+
+
 def _tier_label(lang: str, tier) -> str:
     from db.models import UserTier
 
@@ -38,9 +48,8 @@ def _tier_label(lang: str, tier) -> str:
 
 
 async def _show_consent(target: Message, lang: str) -> None:
-    links = _links(lang)
     await target.answer(
-        t(lang, "consent_text", **links),
+        _consent_html(lang),
         reply_markup=consent_keyboard(lang),
         disable_web_page_preview=True,
     )
@@ -81,8 +90,7 @@ async def _continue_onboarding(
             await target.answer(text, reply_markup=markup, disable_web_page_preview=True)
         return
 
-    links = _links(lang)
-    text = t(lang, "consent_text", **links)
+    text = _consent_html(lang)
     markup = consent_keyboard(lang)
     if edit:
         await edit.edit_text(text, reply_markup=markup, disable_web_page_preview=True)
@@ -101,6 +109,7 @@ async def cmd_start(message: Message, session: AsyncSession) -> None:
         message.from_user.id,
         message.from_user.username,
     )
+    await track(session, user.id, "bot_start")
     await session.commit()
 
     if user.consented_at:
@@ -115,14 +124,25 @@ async def cmd_start(message: Message, session: AsyncSession) -> None:
 
 @router.callback_query(F.data.startswith("lang:"))
 async def set_language(callback: CallbackQuery, session: AsyncSession) -> None:
-    lang = callback.data.split(":")[1]
+    parts = callback.data.split(":")
+    lang = parts[1]
+    return_to = parts[2] if len(parts) > 2 else None
+
     user = await get_or_create_user(
         session,
         callback.from_user.id,
         callback.from_user.username,
     )
     user.language = lang if lang in ("ru", "en", "ua") else "en"
+    await track(session, user.id, "language_set", language=user.language)
     await session.commit()
+
+    if return_to == "settings":
+        from bot.handlers.settings import menu_settings
+
+        await callback.answer(t(user.language, "language_set"))
+        await menu_settings(callback, session)
+        return
 
     await _continue_onboarding(callback.message, session, user, edit=callback.message)
     await callback.answer(t(user.language, "language_set"))
@@ -147,13 +167,13 @@ async def check_channels(callback: CallbackQuery, session: AsyncSession) -> None
         return
 
     user.channels_verified_at = datetime.now(timezone.utc)
+    await track(session, user.id, "channels_verified")
     await session.commit()
 
     await callback.answer(t(lang, "channels_verified"), show_alert=False)
 
-    links = _links(lang)
     await callback.message.edit_text(
-        t(lang, "consent_text", **links),
+        _consent_html(lang),
         reply_markup=consent_keyboard(lang),
         disable_web_page_preview=True,
     )
@@ -173,14 +193,31 @@ async def accept_consent(callback: CallbackQuery, session: AsyncSession) -> None
         await _continue_onboarding(callback.message, session, user, edit=callback.message)
         return
 
+    first_consent = not user.consented_at
     if not user.consented_at:
         user.consented_at = datetime.now(timezone.utc)
     if not user.channels_verified_at and not await channel_gate_required(session, user):
         user.channels_verified_at = datetime.now(timezone.utc)
+
+    if first_consent:
+        await track(session, user.id, "consent_accepted")
     await session.commit()
 
     await callback.message.delete()
     await _show_main_menu(callback.message, session, user)
+
+    if first_consent and not user.welcome_snapshot_at:
+        text = await build_btc_snapshot(lang)
+        if text:
+            await callback.bot.send_message(
+                user.telegram_id,
+                text,
+                disable_web_page_preview=True,
+            )
+            user.welcome_snapshot_at = datetime.now(timezone.utc)
+            await track(session, user.id, "welcome_btc_sent")
+            await session.commit()
+
     await callback.answer()
 
 
@@ -231,6 +268,22 @@ async def menu_profile(callback: CallbackQuery, session: AsyncSession) -> None:
     await callback.answer()
 
 
+@router.callback_query(F.data == "menu:alerts_guide")
+async def menu_alerts_guide(callback: CallbackQuery, session: AsyncSession) -> None:
+    user = await get_or_create_user(
+        session,
+        callback.from_user.id,
+        callback.from_user.username,
+    )
+    lang = user.language
+    await callback.message.edit_text(
+        t(lang, "alerts_guide_text"),
+        reply_markup=back_keyboard(lang),
+        disable_web_page_preview=True,
+    )
+    await callback.answer()
+
+
 @router.callback_query(F.data == "menu:faq")
 async def menu_faq(callback: CallbackQuery, session: AsyncSession) -> None:
     user = await get_or_create_user(
@@ -240,8 +293,9 @@ async def menu_faq(callback: CallbackQuery, session: AsyncSession) -> None:
     )
     lang = user.language
     links = _links(lang)
+    faq_url = links["faq_url"]
     await callback.message.edit_text(
-        t(lang, "faq_text", url=links["faq_url"]),
+        t(lang, "faq_text", url=link(faq_url, faq_url)),
         reply_markup=back_keyboard(lang),
         disable_web_page_preview=True,
     )

@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 
 from aiogram import Bot
+from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramForbiddenError, TelegramRetryAfter
 
 from db.models import DeliveryLog
@@ -34,7 +35,12 @@ async def run_notifier(stop_event: asyncio.Event) -> None:
 
             error = None
             try:
-                await bot.send_message(telegram_id, text, disable_web_page_preview=True)
+                await bot.send_message(
+                    telegram_id,
+                    text,
+                    parse_mode=ParseMode.HTML,
+                    disable_web_page_preview=True,
+                )
             except TelegramRetryAfter as exc:
                 await asyncio.sleep(exc.retry_after + 1)
                 continue

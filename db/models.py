@@ -58,6 +58,7 @@ class User(Base):
     banned: Mapped[bool] = mapped_column(Boolean, default=False)
     consented_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     channels_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    welcome_snapshot_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -159,8 +160,21 @@ class MarketUniverse(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     symbol: Mapped[str] = mapped_column(String(32), index=True)
     rank: Mapped[int] = mapped_column(Integer)
+    turnover_24h: Mapped[float | None] = mapped_column(Float, nullable=True)
     active_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     active_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class UserEvent(Base):
+    __tablename__ = "user_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    event: Mapped[str] = mapped_column(String(64), index=True)
+    event_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
 
 
 class AdminAudit(Base):
