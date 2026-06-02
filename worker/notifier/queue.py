@@ -17,8 +17,8 @@ def _queue_score(deliver_at: float, priority: int, signal_id: int) -> float:
 
 
 async def enqueue(
-    user_id: int,
-    telegram_id: int,
+    user_id: int | None,
+    telegram_id: int | str,
     signal_id: int,
     priority: int,
     text: str,

@@ -30,7 +30,7 @@ async def run_notifier(stop_event: asyncio.Event) -> None:
             telegram_id = item["telegram_id"]
             text = item["text"]
             signal_id = item["signal_id"]
-            user_id = item["user_id"]
+            user_id = item.get("user_id")
             priority = item.get("priority", 2)
 
             error = None
@@ -50,17 +50,18 @@ async def run_notifier(stop_event: asyncio.Event) -> None:
                 error = str(exc)
                 logger.warning("Send failed %s: %s", telegram_id, exc)
 
-            async with SessionLocal() as session:
-                session.add(
-                    DeliveryLog(
-                        signal_id=signal_id,
-                        user_id=user_id,
-                        priority=priority,
-                        sent_at=datetime.now(timezone.utc) if not error else None,
-                        error=error,
+            if user_id is not None:
+                async with SessionLocal() as session:
+                    session.add(
+                        DeliveryLog(
+                            signal_id=signal_id,
+                            user_id=user_id,
+                            priority=priority,
+                            sent_at=datetime.now(timezone.utc) if not error else None,
+                            error=error,
+                        )
                     )
-                )
-                await session.commit()
+                    await session.commit()
 
             await asyncio.sleep(0.04)
     finally:

@@ -1,12 +1,6 @@
 from db.models import SignalLog
 from shared.signal_types import SignalType
 
-DISCLAIMER = {
-    "ru": "ℹ️ Не финансовая рекомендация",
-    "en": "ℹ️ Not financial advice",
-    "ua": "ℹ️ Не фінансова рекомендація",
-}
-
 TYPE_LABELS = {
     "ru": {
         SignalType.FUNDING: "Funding Extreme",
@@ -61,5 +55,4 @@ def format_signal_message(lang: str, signal: SignalLog) -> str:
 
     lines.append(f"📈 {BIAS_LABELS[lang].get(bias, bias)}")
     lines.append(f"⚡ {signal.confidence}")
-    lines.append(DISCLAIMER[lang])
     return "\n".join(lines)

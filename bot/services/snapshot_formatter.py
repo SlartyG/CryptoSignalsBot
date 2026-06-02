@@ -30,7 +30,5 @@ def format_btc_snapshot(lang: str, data: dict) -> str:
             volume_ratio=data["volume_ratio"],
             price_change_1h=data["price_change_1h"],
         ),
-        "",
-        t(lang, "btc_snapshot_disclaimer"),
     ]
     return "\n".join(lines)

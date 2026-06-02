@@ -7,11 +7,19 @@ from bot.services.users import get_active_subscription
 from db.models import SignalLog, User, UserSignalSetting
 from shared.signal_types import FREE_DELAY_SEC
 from shared.universe import get_active_symbols, get_base_symbols, get_default_paid_symbols
+from shared.yaml_config import load_yaml
 from worker.notifier.formatter import format_signal_message
 from worker.notifier.queue import enqueue
 
 PRIORITY_PAID = 1
 PRIORITY_FREE = 2
+
+
+def _free_channel_id() -> str:
+    cfg = load_yaml("app.yaml")
+    # Backward-compatible keys for channel identifier.
+    channel_id = cfg.get("free_signals_channel_id") or cfg.get("free_channel_id") or ""
+    return str(channel_id).strip()
 
 
 async def _user_enabled(session: AsyncSession, user_id: int, signal_type: str) -> bool:
@@ -48,6 +56,7 @@ async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None
 
     universe = await get_active_symbols(session)
     base_symbols = await get_base_symbols(session)
+    free_channel_id = _free_channel_id()
     result = await session.execute(
         select(User).where(User.banned.is_(False), User.consented_at.is_not(None))
     )
@@ -81,4 +90,15 @@ async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None
             priority,
             text,
             deliver_at=deliver_at,
+        )
+
+    if free_channel_id and signal.symbol in base_symbols:
+        text = format_signal_message("ru", signal)
+        await enqueue(
+            None,
+            free_channel_id,
+            signal.id,
+            PRIORITY_FREE,
+            text,
+            deliver_at=now,
         )
