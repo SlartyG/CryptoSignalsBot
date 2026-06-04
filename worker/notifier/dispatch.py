@@ -100,5 +100,5 @@ async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None
             signal.id,
             PRIORITY_FREE,
             text,
-            deliver_at=now,
+            deliver_at=now + FREE_DELAY_SEC,
         )

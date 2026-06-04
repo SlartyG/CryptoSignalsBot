@@ -28,6 +28,18 @@ BIAS_LABELS = {
     "ua": {"bullish": "бичий bias", "bearish": "ведмежий bias", "neutral": "нейтрально"},
 }
 
+BIAS_EMOJI = {
+    "bullish": "🟢",
+    "bearish": "🔴",
+    "neutral": "⚪",
+}
+
+
+def _display_symbol(symbol: str) -> str:
+    if symbol.endswith("USDT"):
+        return symbol[:-4]
+    return symbol
+
 
 def format_signal_message(lang: str, signal: SignalLog) -> str:
     lang = lang if lang in ("ru", "en", "ua") else "en"
@@ -35,7 +47,9 @@ def format_signal_message(lang: str, signal: SignalLog) -> str:
     bias = payload.get("bias", "neutral")
     stype = SignalType(signal.type)
 
-    lines = [f"🔔 <b>{signal.symbol}</b> · {TYPE_LABELS[lang].get(stype, signal.type)}"]
+    display = _display_symbol(signal.symbol)
+    emoji = BIAS_EMOJI.get(bias, "⚪")
+    lines = [f"{emoji} #{display} · {TYPE_LABELS[lang].get(stype, signal.type)}"]
 
     if stype == SignalType.FUNDING:
         lines.append(
