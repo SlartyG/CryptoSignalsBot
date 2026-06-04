@@ -2,6 +2,9 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.i18n import t
 from bot.services.channels import RequiredChannel, get_required_channels
+from bot.services.crypto_pay import CryptoPayClient
+from bot.services.xrocket_pay import XRocketPayClient
+from shared.pricing import format_usdt_price, plan_price_usdt
 from shared.signal_types import PAIRS_PAGE_SIZE, SignalType
 
 
@@ -78,17 +81,49 @@ def back_keyboard(lang: str) -> InlineKeyboardMarkup:
     )
 
 
+def _plan_button_text(lang: str, plan: str, period_key: str) -> str:
+    return t(
+        lang,
+        "btn_buy_with_price",
+        period=t(lang, period_key),
+        price=format_usdt_price(plan_price_usdt(plan)),
+    )
+
+
 def subscription_keyboard(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text=t(lang, "btn_buy_1m"), callback_data="buy:1m"),
-                InlineKeyboardButton(text=t(lang, "btn_buy_3m"), callback_data="buy:3m"),
+                InlineKeyboardButton(
+                    text=_plan_button_text(lang, "1m", "btn_buy_1m"),
+                    callback_data="buy:1m",
+                ),
+                InlineKeyboardButton(
+                    text=_plan_button_text(lang, "3m", "btn_buy_3m"),
+                    callback_data="buy:3m",
+                ),
             ],
-            [InlineKeyboardButton(text=t(lang, "btn_buy_12m"), callback_data="buy:12m")],
+            [
+                InlineKeyboardButton(
+                    text=_plan_button_text(lang, "12m", "btn_buy_12m"),
+                    callback_data="buy:12m",
+                )
+            ],
             [InlineKeyboardButton(text=t(lang, "btn_back"), callback_data="menu:main")],
         ]
     )
+
+
+def invoice_pay_keyboard(lang: str, pay_url: str) -> InlineKeyboardMarkup:
+    rows: list[list[InlineKeyboardButton]] = []
+    if pay_url:
+        rows.append(
+            [InlineKeyboardButton(text=t(lang, "btn_pay_invoice"), url=pay_url)]
+        )
+    rows.append(
+        [InlineKeyboardButton(text=t(lang, "btn_back"), callback_data="menu:main")]
+    )
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def currency_keyboard(lang: str, plan: str) -> InlineKeyboardMarkup:
@@ -113,6 +148,39 @@ def currency_keyboard(lang: str, plan: str) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text=t(lang, "btn_back"), callback_data="menu:subscription")],
         ]
     )
+
+
+def provider_keyboard(lang: str, plan: str, currency: str) -> InlineKeyboardMarkup | None:
+    rows: list[list[InlineKeyboardButton]] = []
+    if CryptoPayClient()._token:
+        rows.append(
+            [
+                InlineKeyboardButton(
+                    text=t(lang, "pay_provider_cryptopay"),
+                    callback_data=f"provider:{plan}:{currency}:cryptopay",
+                )
+            ]
+        )
+    if XRocketPayClient()._token:
+        rows.append(
+            [
+                InlineKeyboardButton(
+                    text=t(lang, "pay_provider_xrocket"),
+                    callback_data=f"provider:{plan}:{currency}:xrocket",
+                )
+            ]
+        )
+    if not rows:
+        return None
+    rows.append(
+        [
+            InlineKeyboardButton(
+                text=t(lang, "btn_back"),
+                callback_data=f"buy:{plan}",
+            )
+        ]
+    )
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def settings_keyboard(lang: str, settings_map: dict[str, bool], is_paid: bool) -> InlineKeyboardMarkup:

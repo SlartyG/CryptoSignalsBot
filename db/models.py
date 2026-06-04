@@ -48,6 +48,11 @@ class PaymentStatus(StrEnum):
     EXPIRED = "expired"
 
 
+class PaymentProvider(StrEnum):
+    CRYPTO_PAY = "cryptopay"
+    XROCKET = "xrocket"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -88,6 +93,9 @@ class Payment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     invoice_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    provider: Mapped[str] = mapped_column(
+        String(20), default=PaymentProvider.CRYPTO_PAY, index=True
+    )
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(10))
     amount_usdt: Mapped[float] = mapped_column(Float)

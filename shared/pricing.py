@@ -1,6 +1,13 @@
 from shared.yaml_config import load_yaml
 
 
+def format_usdt_price(amount: float) -> str:
+    if amount == int(amount):
+        return str(int(amount))
+    text = f"{amount:.2f}".rstrip("0").rstrip(".")
+    return text or "0"
+
+
 def plan_price_usdt(plan: str) -> float:
     cfg = load_yaml("pricing.yaml")
     base = float(cfg.get("month_usdt", 15))

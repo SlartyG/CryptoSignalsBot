@@ -49,6 +49,7 @@ btn_pairs: "📊 Пары"
 btn_buy_1m: "1 мес"
 btn_buy_3m: "3 мес (−25%)"
 btn_buy_12m: "12 мес (−50%)"
+btn_buy_with_price: "{period} · {price} USDT"
 
 profile_text: |
   👤 Профиль
@@ -122,7 +123,24 @@ pay_currency_usdt: "USDT"
 pay_currency_ton: "TON"
 pay_currency_btc: "BTC"
 
-invoice_created: "Счёт создан. Оплатите по ссылке:\n{url}"
+currency_selected: "Валюта: {currency}"
+choose_provider: "Выберите способ оплаты:"
+pay_provider_cryptopay: "Crypto Bot"
+pay_provider_xrocket: "xRocket"
+pay_not_configured: "Оплата не настроена. Обратитесь в поддержку."
+
+btn_pay_invoice: "💳 Оплатить"
+invoice_created: |
+  Счёт создан. Нажмите кнопку ниже для оплаты.
+
+  После оплаты обработка может занять несколько минут — мы пришлём сообщение, когда Paid будет активирован.
+invoice_no_url: "Не удалось получить ссылку на оплату."
+
+payment_success: |
+  ✅ Оплата получена!
+
+  Paid активна до {ends_at}.
+  Сигналы приходят без задержки.
 
 not_implemented: "Раздел в разработке."
 

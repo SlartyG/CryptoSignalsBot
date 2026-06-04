@@ -82,6 +82,7 @@ REDIS_URL=redis://localhost:6379/0
 
 # Опционально — для теста оплаты
 CRYPTO_PAY_TOKEN=
+XROCKET_PAY_TOKEN=
 ```
 
 | Переменная | Откуда |
