@@ -11,3 +11,5 @@ __pycache__/
 .vscode/
 *.log
 pgdata/
+Теория
+.DS_Store

@@ -1,6 +1,6 @@
 admin_telegram_ids: [533476085]
 
-support_contact: "@your_support"
+support_contact: "@midas_crypto_support"
 
 # Free onboarding: user must subscribe to all listed channels once at /start.
 # Bot must be admin in each channel to verify membership.
@@ -14,12 +14,12 @@ required_channels:
   #   url: "https://t.me/another_channel"
 
 links:
-  offer_ru: "https://telegra.ph/offer-ru"
-  offer_en: "https://telegra.ph/offer-en"
-  offer_ua: "https://telegra.ph/offer-ua"
-  privacy_ru: "https://telegra.ph/privacy-ru"
-  privacy_en: "https://telegra.ph/privacy-en"
-  privacy_ua: "https://telegra.ph/privacy-ua"
-  faq_ru: "https://telegra.ph/faq-ru"
-  faq_en: "https://telegra.ph/faq-en"
-  faq_ua: "https://telegra.ph/faq-ua"
+  offer_ru: "https://telegra.ph/Publichnaya-oferta-na-okazanie-informacionnyh-uslug-06-08"
+  offer_en: "https://telegra.ph/Terms-of-Service-Public-Offer-06-08"
+  offer_ua: "https://telegra.ph/Publ%D1%96chna-oferta-na-nadannya-%D1%96nformac%D1%96jnih-poslug-06-08"
+  privacy_ru: "https://telegra.ph/Politika-konfidencialnosti-06-08-20"
+  privacy_en: "https://telegra.ph/Midas-Privacy-Policy-06-08"
+  privacy_ua: "https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-06-08"
+  faq_ru: "https://telegra.ph/CHasto-zadavaemye-voprosy-FAQ-06-08-2"
+  faq_en: "https://telegra.ph/Frequently-Asked-Questions-FAQ-06-08"
+  faq_ua: "https://telegra.ph/CHast%D1%96-zapitannya-FAQ-06-08"
