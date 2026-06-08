@@ -1,15 +1,25 @@
+import time
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.services.users import get_active_subscription
 from db.models import SignalLog, User, UserSignalSetting
-from shared.universe import get_active_symbols
+from shared.signal_types import FREE_DELAY_SEC
+from shared.universe import get_active_symbols, get_base_symbols, get_default_paid_symbols
+from shared.yaml_config import load_yaml
 from worker.notifier.formatter import format_signal_message
 from worker.notifier.queue import enqueue
 
-FREE_SYMBOL = "BTCUSDT"
 PRIORITY_PAID = 1
 PRIORITY_FREE = 2
+
+
+def _free_channel_id() -> str:
+    cfg = load_yaml("app.yaml")
+    # Backward-compatible keys for channel identifier.
+    channel_id = cfg.get("free_signals_channel_id") or cfg.get("free_channel_id") or ""
+    return str(channel_id).strip()
 
 
 async def _user_enabled(session: AsyncSession, user_id: int, signal_type: str) -> bool:
@@ -35,7 +45,8 @@ async def _user_symbols(session: AsyncSession, user_id: int, universe: list[str]
     setting = result.scalar_one_or_none()
     if setting and setting.symbols:
         return [s for s in setting.symbols if s in universe]
-    return universe
+    default = await get_default_paid_symbols(session)
+    return [s for s in default if s in universe]
 
 
 async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None:
@@ -44,10 +55,13 @@ async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None
         return
 
     universe = await get_active_symbols(session)
+    base_symbols = await get_base_symbols(session)
+    free_channel_id = _free_channel_id()
     result = await session.execute(
         select(User).where(User.banned.is_(False), User.consented_at.is_not(None))
     )
     users = result.scalars().all()
+    now = time.time()
 
     for user in users:
         if not await _user_enabled(session, user.id, signal.type):
@@ -61,10 +75,30 @@ async def enqueue_signal_delivery(session: AsyncSession, signal_id: int) -> None
             if signal.symbol not in allowed:
                 continue
             priority = PRIORITY_PAID
+            deliver_at = now
         else:
-            if signal.symbol != FREE_SYMBOL:
+            if signal.symbol not in base_symbols:
                 continue
             priority = PRIORITY_FREE
+            deliver_at = now + FREE_DELAY_SEC
 
         text = format_signal_message(user.language, signal)
-        await enqueue(user.id, user.telegram_id, signal.id, priority, text)
+        await enqueue(
+            user.id,
+            user.telegram_id,
+            signal.id,
+            priority,
+            text,
+            deliver_at=deliver_at,
+        )
+
+    if free_channel_id and signal.symbol in base_symbols:
+        text = format_signal_message("ru", signal)
+        await enqueue(
+            None,
+            free_channel_id,
+            signal.id,
+            PRIORITY_FREE,
+            text,
+            deliver_at=now + FREE_DELAY_SEC,
+        )

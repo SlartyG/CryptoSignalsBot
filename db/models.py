@@ -48,6 +48,11 @@ class PaymentStatus(StrEnum):
     EXPIRED = "expired"
 
 
+class PaymentProvider(StrEnum):
+    CRYPTO_PAY = "cryptopay"
+    XROCKET = "xrocket"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -58,6 +63,7 @@ class User(Base):
     banned: Mapped[bool] = mapped_column(Boolean, default=False)
     consented_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     channels_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    welcome_snapshot_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -87,6 +93,9 @@ class Payment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     invoice_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    provider: Mapped[str] = mapped_column(
+        String(20), default=PaymentProvider.CRYPTO_PAY, index=True
+    )
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(10))
     amount_usdt: Mapped[float] = mapped_column(Float)
@@ -159,8 +168,21 @@ class MarketUniverse(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     symbol: Mapped[str] = mapped_column(String(32), index=True)
     rank: Mapped[int] = mapped_column(Integer)
+    turnover_24h: Mapped[float | None] = mapped_column(Float, nullable=True)
     active_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     active_to: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class UserEvent(Base):
+    __tablename__ = "user_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    event: Mapped[str] = mapped_column(String(64), index=True)
+    event_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
 
 
 class AdminAudit(Base):

@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timezone
 
 from aiogram import Bot
+from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramForbiddenError, TelegramRetryAfter
 
 from db.models import DeliveryLog
@@ -29,12 +30,17 @@ async def run_notifier(stop_event: asyncio.Event) -> None:
             telegram_id = item["telegram_id"]
             text = item["text"]
             signal_id = item["signal_id"]
-            user_id = item["user_id"]
+            user_id = item.get("user_id")
             priority = item.get("priority", 2)
 
             error = None
             try:
-                await bot.send_message(telegram_id, text, disable_web_page_preview=True)
+                await bot.send_message(
+                    telegram_id,
+                    text,
+                    parse_mode=ParseMode.HTML,
+                    disable_web_page_preview=True,
+                )
             except TelegramRetryAfter as exc:
                 await asyncio.sleep(exc.retry_after + 1)
                 continue
@@ -44,17 +50,18 @@ async def run_notifier(stop_event: asyncio.Event) -> None:
                 error = str(exc)
                 logger.warning("Send failed %s: %s", telegram_id, exc)
 
-            async with SessionLocal() as session:
-                session.add(
-                    DeliveryLog(
-                        signal_id=signal_id,
-                        user_id=user_id,
-                        priority=priority,
-                        sent_at=datetime.now(timezone.utc) if not error else None,
-                        error=error,
+            if user_id is not None:
+                async with SessionLocal() as session:
+                    session.add(
+                        DeliveryLog(
+                            signal_id=signal_id,
+                            user_id=user_id,
+                            priority=priority,
+                            sent_at=datetime.now(timezone.utc) if not error else None,
+                            error=error,
+                        )
                     )
-                )
-                await session.commit()
+                    await session.commit()
 
             await asyncio.sleep(0.04)
     finally:

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://app:app@localhost:5432/cryptobot"
     redis_url: str = "redis://localhost:6379/0"
     crypto_pay_token: str = ""
+    xrocket_pay_token: str = ""
     admin_telegram_ids: str = ""
 
 

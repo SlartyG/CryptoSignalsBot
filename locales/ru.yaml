@@ -6,6 +6,7 @@ start_welcome: |
   Выберите язык / Choose language:
 
 language_set: "Язык: Русский"
+choose_language: "Выберите язык интерфейса:"
 
 channels_text: |
   Для бесплатного доступа подпишитесь на наши каналы.
@@ -16,11 +17,13 @@ channels_not_subscribed: "Вы не подписаны на: {channels}"
 channels_verified: "Подписка подтверждена!"
 channels_required: "Сначала подпишитесь на каналы"
 
+consent_offer_label: "Публичная оферта"
+consent_privacy_label: "Политика конфиденциальности"
 consent_text: |
   Перед использованием примите условия:
 
-  • [Публичная оферта]({offer_url})
-  • [Политика конфиденциальности]({privacy_url})
+  • {offer_link}
+  • {privacy_link}
 
   Нажимая «Принимаю», вы соглашаетесь с документами.
 
@@ -37,12 +40,16 @@ main_menu_text: |
 btn_profile: "👤 Профиль"
 btn_subscription: "💳 Подписка"
 btn_settings: "⚙️ Настройки"
+btn_alerts_guide: "📖 Как читать алерты"
 btn_faq: "❓ FAQ"
 btn_support: "📩 Поддержка"
 btn_back: "◀️ Назад"
+btn_language: "🌐 Язык"
+btn_pairs: "📊 Пары"
 btn_buy_1m: "1 мес"
 btn_buy_3m: "3 мес (−25%)"
 btn_buy_12m: "12 мес (−50%)"
+btn_buy_with_price: "{period} · {price} USDT"
 
 profile_text: |
   👤 Профиль
@@ -61,6 +68,8 @@ subscription_text: |
 
   Выберите план и валюту:
 
+plan_selected: "План: {plan}"
+
 settings_text: |
   ⚙️ Настройки сигналов
 
@@ -69,13 +78,40 @@ settings_text: |
 settings_pairs_text: |
   ⚙️ Пары (paid)
 
+  Страница {page}/{total_pages} · выбрано: {selected_count}
+
   {pairs_list}
+
+pairs_sort_vol: "📊 По объёму"
+pairs_sort_alpha: "🔤 По алфавиту"
+pairs_paid_only: "Выбор пар доступен на paid-тарифе"
+
+signal_type_funding: "Funding"
+signal_type_oi: "OI+Price"
+signal_type_liq: "Liquidation"
+signal_type_volume: "Volume"
+
+alerts_guide_text: |
+  <b>Как читать алерт</b>
+
+  Каждое сообщение начинается с пары и типа сигнала, например:
+  <b>BTCUSDT · Funding Extreme</b>
+
+  <b>Funding Extreme</b> — ставка funding сильно отклонилась от средней за сутки.
+  <b>OI + Price</b> — за час изменились открытый интерес и цена; внизу будет паттерн (новые лонги, flush и т.д.).
+  <b>Liquidation Spike</b> — крупная сумма ликвидаций за короткое окно.
+  <b>Volume Spike</b> — объём часовой свечи заметно выше обычного.
+
+  Строка <b>bias</b> — направление перекоса (бычий / медвежий / нейтрально).
+  <b>medium / high</b> — сила отклонения по нашим порогам.
+
+  Это контекст для анализа, не сигнал «входи сейчас».
 
 faq_text: "Частые вопросы: {url}"
 support_text: "Поддержка: {contact}"
 
-tier_free: "Free (BTC)"
-tier_paid: "Paid (топ-10)"
+tier_free: "Free (10 рынков, −1 мин)"
+tier_paid: "Paid (до 100 рынков)"
 
 sub_status_active: "активна"
 sub_status_none: "нет paid-подписки"
@@ -87,6 +123,30 @@ pay_currency_usdt: "USDT"
 pay_currency_ton: "TON"
 pay_currency_btc: "BTC"
 
-invoice_created: "Счёт создан. Оплатите по ссылке:\n{url}"
+currency_selected: "Валюта: {currency}"
+choose_provider: "Выберите способ оплаты:"
+pay_provider_cryptopay: "Crypto Bot"
+pay_provider_xrocket: "xRocket"
+pay_not_configured: "Оплата не настроена. Обратитесь в поддержку."
+
+btn_pay_invoice: "💳 Оплатить"
+invoice_created: |
+  Счёт создан. Нажмите кнопку ниже для оплаты.
+
+  После оплаты обработка может занять несколько минут — мы пришлём сообщение, когда Paid будет активирован.
+invoice_no_url: "Не удалось получить ссылку на оплату."
+
+payment_success: |
+  ✅ Оплата получена!
+
+  Paid активна до {ends_at}.
+  Сигналы приходят без задержки.
 
 not_implemented: "Раздел в разработке."
+
+btc_snapshot_title: "🎁 Срез рынка BTC сейчас"
+btc_snapshot_price: "💰 Цена: ${price} · 24ч: {change_24h}%"
+btc_snapshot_funding: "📊 Funding: {funding_pct:+.3f}% · ср. 24ч: {avg_24h_pct:+.3f}%"
+btc_snapshot_oi: "📈 OI (5m): {oi_change_pct:+.1f}%"
+btc_snapshot_volume: "📉 Объём 1h: {volume_ratio:.1f}× медианы · цена 1h: {price_change_1h:+.1f}%"
+btc_snapshot_disclaimer: "ℹ️ Не финансовая рекомендация. Алерты приходят автоматически при срабатывании правил."

@@ -6,6 +6,7 @@ start_welcome: |
   Оберіть мову / Choose language:
 
 language_set: "Мова: Українська"
+choose_language: "Оберіть мову інтерфейсу:"
 
 channels_text: |
   Для безкоштовного доступу підпишіться на наші канали.
@@ -16,11 +17,13 @@ channels_not_subscribed: "Ви не підписані на: {channels}"
 channels_verified: "Підписку підтверджено!"
 channels_required: "Спочатку підпишіться на канали"
 
+consent_offer_label: "Публічна оферта"
+consent_privacy_label: "Політика конфіденційності"
 consent_text: |
   Перед використанням прийміть умови:
 
-  • [Публічна оферта]({offer_url})
-  • [Політика конфіденційності]({privacy_url})
+  • {offer_link}
+  • {privacy_link}
 
   Натискаючи «Приймаю», ви погоджуєтесь з документами.
 
@@ -37,12 +40,16 @@ main_menu_text: |
 btn_profile: "👤 Профіль"
 btn_subscription: "💳 Підписка"
 btn_settings: "⚙️ Налаштування"
+btn_alerts_guide: "📖 Як читати алерти"
 btn_faq: "❓ FAQ"
 btn_support: "📩 Підтримка"
 btn_back: "◀️ Назад"
+btn_language: "🌐 Мова"
+btn_pairs: "📊 Пари"
 btn_buy_1m: "1 міс"
 btn_buy_3m: "3 міс (−25%)"
 btn_buy_12m: "12 міс (−50%)"
+btn_buy_with_price: "{period} · {price} USDT"
 
 profile_text: |
   👤 Профіль
@@ -61,6 +68,8 @@ subscription_text: |
 
   Оберіть план і валюту:
 
+plan_selected: "План: {plan}"
+
 settings_text: |
   ⚙️ Налаштування сигналів
 
@@ -69,13 +78,40 @@ settings_text: |
 settings_pairs_text: |
   ⚙️ Пари (paid)
 
+  Сторінка {page}/{total_pages} · обрано: {selected_count}
+
   {pairs_list}
+
+pairs_sort_vol: "📊 За обсягом"
+pairs_sort_alpha: "🔤 За алфавітом"
+pairs_paid_only: "Вибір пар доступний на paid-тарифі"
+
+signal_type_funding: "Funding"
+signal_type_oi: "OI+Price"
+signal_type_liq: "Liquidation"
+signal_type_volume: "Volume"
+
+alerts_guide_text: |
+  <b>Як читати алерт</b>
+
+  Кожне повідомлення починається з пари та типу сигналу, наприклад:
+  <b>BTCUSDT · Funding Extreme</b>
+
+  <b>Funding Extreme</b> — ставка funding сильно відхилилась від середньої за добу.
+  <b>OI + Price</b> — за годину змінились відкритий інтерес і ціна; внизу буде паттерн.
+  <b>Liquidation Spike</b> — велика сума ліквідацій за коротке вікно.
+  <b>Volume Spike</b> — обсяг годинної свічки помітно вище звичного.
+
+  Рядок <b>bias</b> — напрям перекосу (бичий / ведмежий / нейтрально).
+  <b>medium / high</b> — сила відхилення за нашими порогами.
+
+  Це контекст для аналізу, не сигнал «входь зараз».
 
 faq_text: "FAQ: {url}"
 support_text: "Підтримка: {contact}"
 
-tier_free: "Free (BTC)"
-tier_paid: "Paid (топ-10)"
+tier_free: "Free (10 ринків, −1 хв)"
+tier_paid: "Paid (до 100 ринків)"
 
 sub_status_active: "активна"
 sub_status_none: "немає paid-підписки"
@@ -87,6 +123,30 @@ pay_currency_usdt: "USDT"
 pay_currency_ton: "TON"
 pay_currency_btc: "BTC"
 
-invoice_created: "Рахунок створено. Оплатіть за посиланням:\n{url}"
+currency_selected: "Валюта: {currency}"
+choose_provider: "Оберіть спосіб оплати:"
+pay_provider_cryptopay: "Crypto Bot"
+pay_provider_xrocket: "xRocket"
+pay_not_configured: "Оплату не налаштовано. Зверніться в підтримку."
+
+btn_pay_invoice: "💳 Оплатити"
+invoice_created: |
+  Рахунок створено. Натисніть кнопку нижче для оплати.
+
+  Після оплати обробка може зайняти кілька хвилин — надішлемо повідомлення, коли Paid буде активовано.
+invoice_no_url: "Не вдалося отримати посилання на оплату."
+
+payment_success: |
+  ✅ Оплату отримано!
+
+  Paid активна до {ends_at}.
+  Сигнали надходять без затримки.
 
 not_implemented: "Розділ у розробці."
+
+btc_snapshot_title: "🎁 Зріз ринку BTC зараз"
+btc_snapshot_price: "💰 Ціна: ${price} · 24г: {change_24h}%"
+btc_snapshot_funding: "📊 Funding: {funding_pct:+.3f}% · сер. 24г: {avg_24h_pct:+.3f}%"
+btc_snapshot_oi: "📈 OI (5m): {oi_change_pct:+.1f}%"
+btc_snapshot_volume: "📉 Обсяг 1г: {volume_ratio:.1f}× медіани · ціна 1г: {price_change_1h:+.1f}%"
+btc_snapshot_disclaimer: "ℹ️ Не фінансова рекомендація. Алерти надсилаються автоматично при спрацюванні правил."

@@ -77,7 +77,7 @@ async def payment_poller(stop_event: asyncio.Event) -> None:
         except Exception:
             logger.exception("Payment poller failed")
         try:
-            await asyncio.wait_for(stop_event.wait(), timeout=120)
+            await asyncio.wait_for(stop_event.wait(), timeout=30)
             break
         except asyncio.TimeoutError:
             pass

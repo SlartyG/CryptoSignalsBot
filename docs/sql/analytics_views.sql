@@ -61,3 +61,70 @@ WHERE d.sent_at IS NOT NULL
   AND d.error IS NULL
   AND d.sent_at >= now() - interval '7 days'
 GROUP BY d.priority;
+
+CREATE OR REPLACE VIEW v_funnel_steps AS
+SELECT
+    count(DISTINCT u.id) AS users_total,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'language_set'
+        )
+    ) AS language_set,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'channels_verified'
+        )
+    ) AS channels_verified,
+    count(DISTINCT u.id) FILTER (
+        WHERE u.consented_at IS NOT NULL
+    ) AS consented,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'welcome_btc_sent'
+        )
+    ) AS welcome_btc_sent,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'menu_subscription_open'
+        )
+    ) AS subscription_viewed,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'payment_invoice_created'
+        )
+    ) AS invoice_created,
+    count(DISTINCT u.id) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM payments p
+            WHERE p.user_id = u.id AND p.status = 'paid'
+        )
+    ) AS paid
+FROM users u
+WHERE u.banned = false;
+
+CREATE OR REPLACE VIEW v_funnel_daily AS
+SELECT
+    date_trunc('day', u.created_at) AS cohort_day,
+    count(*) AS registered,
+    count(*) FILTER (WHERE u.consented_at IS NOT NULL) AS consented,
+    count(*) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM user_events e
+            WHERE e.user_id = u.id AND e.event = 'welcome_btc_sent'
+        )
+    ) AS welcome_btc_sent,
+    count(*) FILTER (
+        WHERE EXISTS (
+            SELECT 1 FROM payments p
+            WHERE p.user_id = u.id AND p.status = 'paid'
+        )
+    ) AS converted_paid
+FROM users u
+WHERE u.banned = false
+GROUP BY 1
+ORDER BY 1;
